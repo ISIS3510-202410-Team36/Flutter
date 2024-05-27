@@ -99,7 +99,7 @@ class _BodyViewState extends State<BodyView> {
     setState(() => _isRecording = false);
   }
 
-  int currentIndex = 3;
+  int currentIndex = 0;
 
   void setCurrentIndex(int index){
     setState(() {
