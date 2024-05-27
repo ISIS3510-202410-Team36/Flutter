@@ -1,16 +1,10 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:unimarket/Controllers/cart_controller.dart';
-
-import 'package:unimarket/Controllers/search_controllerUnimarket.dart';
-import 'package:unimarket/Models/Repository/cartRepository.dart';
-import 'package:unimarket/Models/Repository/productReposirory.dart';
-import 'package:unimarket/Models/model.dart';
 import 'dart:async';
 
 import 'package:noise_meter/noise_meter.dart';
-import 'package:flutter/material.dart';
+
 import 'package:permission_handler/permission_handler.dart';
 
 class ChatView extends StatefulWidget {
@@ -43,30 +37,20 @@ class _ChatViewState extends State<ChatView> {
     stop();
   }
 
-  /// Check if microphone permission is granted.
   Future<bool> checkPermission() async => await Permission.microphone.isGranted;
 
-  /// Request the microphone permission.
   Future<void> requestPermission() async =>
       await Permission.microphone.request();
 
-  /// Start noise sampling.
   Future<void> start() async {
-    // Create a noise meter, if not already done.
     noiseMeter ??= NoiseMeter();
 
-    // Check permission to use the microphone.
-    //
-    // Remember to update the AndroidManifest file (Android) and the
-    // Info.plist and pod files (iOS).
     if (!(await checkPermission())) await requestPermission();
 
-    // Listen to the noise stream.
     _noiseSubscription = noiseMeter?.noise.listen(onData, onError: onError);
     setState(() => _isRecording = true);
   }
 
-  /// Stop sampling.
   void stop() {
     _noiseSubscription?.cancel();
     setState(() => _isRecording = false);

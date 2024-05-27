@@ -4,10 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:unimarket/Models/product_model.dart';
-import 'package:unimarket/Models/seller_model.dart';
 
 class PublishController extends ChangeNotifier {
-
   final TextEditingController iconController = TextEditingController();
   final TextEditingController useController = TextEditingController();
 
@@ -15,16 +13,15 @@ class PublishController extends ChangeNotifier {
   final TextEditingController controllerPrice = TextEditingController();
   final TextEditingController controllerDescription = TextEditingController();
 
-
   Future addProductToCatalog(ProductModel product, File image) async {
-
     var imageName = DateTime.now().millisecondsSinceEpoch.toString();
     var storageRef =
         FirebaseStorage.instance.ref().child('products_images/$imageName.jpg');
     var uploadTask = storageRef.putFile(image);
     var downloadUrl = await (await uploadTask).ref.getDownloadURL();
 
-    DocumentReference valor =  await FirebaseFirestore.instance.collection('products').add({
+    DocumentReference valor =
+        await FirebaseFirestore.instance.collection('products').add({
       'name': product.name,
       'price': product.price,
       'category': product.category,
