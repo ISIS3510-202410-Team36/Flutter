@@ -621,6 +621,17 @@ class _PublishViewState extends State<PublishView> {
       );
   }
 
+  @override
+  void dispose() {
+    //subscription.stopListening();
+    _publishController.controllerName.dispose();
+    _publishController.controllerPrice.dispose();
+    _publishController.controllerDescription.dispose();
+    _publishController.iconController.dispose();
+    _publishController.useController.dispose();
+    super.dispose();
+  }
+
   void showImagePickerOption(BuildContext context) {
     showModalBottomSheet(
         backgroundColor: Colors.deepOrange[200],
