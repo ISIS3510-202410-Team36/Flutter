@@ -13,11 +13,6 @@ class CartView extends StatefulWidget {
 class _CartViewState extends State<CartView> {
   List<ProductModel> products = CartController().getCartProducts();
   int totalPrice = Model().cartPrice;
-  // calculatePrice() {
-  //   for (ProductModel p in products) {
-  //     totalPrice += p.price;
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -93,9 +88,7 @@ class _CartViewState extends State<CartView> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Add your onPressed logic here
-        },
+        onPressed: () {},
         child: Icon(Icons.add),
       ),
     );

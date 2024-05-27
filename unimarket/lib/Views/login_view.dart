@@ -5,11 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_isolate/flutter_isolate.dart';
 import 'package:unimarket/Controllers/network_controller.dart';
-import 'package:unimarket/Controllers/search_controllerUnimarket.dart';
 import 'package:unimarket/Views/register_view.dart';
 import 'package:unimarket/Controllers/auth_controller.dart';
 import 'package:unimarket/Views/body_view.dart';
-import 'package:flutter/foundation.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -17,17 +15,6 @@ class LoginView extends StatefulWidget {
   @override
   State<LoginView> createState() => _LoginViewState();
 }
-
-// void isolateFunction(List arguments) async {
-//   await Firebase.initializeApp(
-//     name: 'unimarket',
-//     options: DefaultFirebaseOptions.currentPlatform,
-//   );
-//   List<ProductModel> prodList = await arguments[1].getAllProducts();
-//   prodList.sort((a,b)=> b.views.compareTo(a.views));
-//   prodList.sublist(0,5);
-//   arguments[0].send(prodList);
-// }
 
 class _LoginViewState extends State<LoginView> {
   late AuthController _authController;
@@ -69,9 +56,7 @@ class _LoginViewState extends State<LoginView> {
   void netCheck() async {
     var receivePort = ReceivePort();
     var rootToken = RootIsolateToken.instance!;
-    print("object");
-    // BackgroundIsolateBinaryMessenger.ensureInitialized(rootToken);
-    // BackgroundIsolateBinaryMessenger.ensureInitialized(rootToken);
+
     final netIsol = await Isolate.spawn(
         netw.checkNetwork, [receivePort.sendPort, rootToken, connectivity]);
 
@@ -86,8 +71,7 @@ class _LoginViewState extends State<LoginView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Container(
-          margin: const EdgeInsets.only(
-              right: 230, top: 17), // Adjust margin as needed
+          margin: const EdgeInsets.only(right: 230, top: 17),
           child: Text(
             labelText,
             textAlign: TextAlign.left,
@@ -123,8 +107,7 @@ class _LoginViewState extends State<LoginView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Container(
-          margin: const EdgeInsets.only(
-              right: 230, top: 17), // Adjust margin as needed
+          margin: const EdgeInsets.only(right: 230, top: 17),
           child: Text(
             labelText,
             textAlign: TextAlign.left,
@@ -160,14 +143,12 @@ class _LoginViewState extends State<LoginView> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor:
-              Color.fromARGB(255, 212, 129, 12), // Set background color to red
+          backgroundColor: Color.fromARGB(255, 212, 129, 12),
           title: const Text('Network Error'),
           content: const Text("Connect to internet please"),
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                // Close the dialog
                 Navigator.of(context).pop();
                 netCheck();
               },
@@ -184,15 +165,13 @@ class _LoginViewState extends State<LoginView> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor:
-              Color.fromARGB(255, 212, 129, 12), // Set background color to red
+          backgroundColor: Color.fromARGB(255, 212, 129, 12),
           title: const Text('Oops!'),
           content: const Text(
               'Something went wrong singing in. Make sure the credentials you are providing are correct and that you already have an account registered'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                // Close the dialog
                 Navigator.of(context).pop();
               },
               child: const Text('OK'),
@@ -206,10 +185,7 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     void authenticationProcess(bool existingUser) {
-      // Aquí va el proceso de verificación con Firebase
-
       if (existingUser) {
-        // netIsol.kill;
         FlutterIsolate.killAll();
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => BodyView()));
@@ -223,9 +199,8 @@ class _LoginViewState extends State<LoginView> {
       body: Column(
         children: [
           Container(
-            height: 200, // Adjust the height as needed
-            color: const Color.fromARGB(
-                255, 250, 206, 190), // Example color, change as needed
+            height: 200,
+            color: const Color.fromARGB(255, 250, 206, 190),
             child: const Center(
               child: Image(
                 image: AssetImage("assets/images/logo.png"),
@@ -239,7 +214,6 @@ class _LoginViewState extends State<LoginView> {
               child: Container(
                 width: 350,
                 height: 550,
-                // margin: const EdgeInsets.only(bottom: 100),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   color: const Color.fromARGB(255, 255, 100, 35),
@@ -287,12 +261,9 @@ class _LoginViewState extends State<LoginView> {
                             ),
                           ),
                         ),
-                        const SizedBox(
-                            height:
-                                20.0), // Add some space between the Sign in button and Register button
+                        const SizedBox(height: 20.0),
                         ElevatedButton(
                           onPressed: () {
-                            // Add your registration logic here
                             FlutterIsolate.killAll();
                             Navigator.push(
                                 context,

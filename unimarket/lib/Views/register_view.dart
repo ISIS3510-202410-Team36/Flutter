@@ -46,15 +46,12 @@ class _RegisterViewState extends State<RegisterView> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor:
-              Color.fromARGB(255, 212, 129, 12), // Set background color to red
+          backgroundColor: Color.fromARGB(255, 212, 129, 12),
           title: const Text('Oops!'),
           content: Text(msg),
-          // 'Something went wrong registering your user. Make sure you are using a valid email format. Make sure your password is at least 6 characters long. Make sure your email is not associated with an existing account'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                // Close the dialog
                 Navigator.of(context).pop();
               },
               child: const Text('OK'),
@@ -70,13 +67,12 @@ class _RegisterViewState extends State<RegisterView> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Colors.green, // Set background color to green
+          backgroundColor: Colors.green,
           title: const Text('Success!'),
           content: const Text('Registration successful! Now please sign in'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                // Close the dialog
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => const LoginView()));
               },
@@ -88,14 +84,12 @@ class _RegisterViewState extends State<RegisterView> {
     );
   }
 
-//hace parte del scaffold. ignorar para otras cosas
   Widget _buildTextField(String labelText, {bool obscureText = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Container(
-          margin: const EdgeInsets.only(
-              right: 230, top: 17), // Adjust margin as needed
+          margin: const EdgeInsets.only(right: 230, top: 17),
           child: Text(
             labelText,
             textAlign: TextAlign.left,
@@ -131,8 +125,7 @@ class _RegisterViewState extends State<RegisterView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Container(
-          margin: const EdgeInsets.only(
-              right: 230, top: 17), // Adjust margin as needed
+          margin: const EdgeInsets.only(right: 230, top: 17),
           child: Text(
             labelText,
             textAlign: TextAlign.left,
@@ -175,16 +168,14 @@ class _RegisterViewState extends State<RegisterView> {
                 MaterialPageRoute(builder: (context) => const LoginView()));
           },
         ),
-        backgroundColor:
-            Colors.transparent, // Para hacer transparente la AppBar
-        elevation: 0, // Para eliminar la sombra debajo de la AppBar
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
       body: Column(
         children: [
           Container(
-            height: 200, // Adjust the height as needed
-            color: const Color.fromARGB(
-                255, 250, 206, 190), // Example color, change as needed
+            height: 200,
+            color: const Color.fromARGB(255, 250, 206, 190),
             child: const Center(
               child: Image(
                 image: AssetImage("assets/images/logo.png"),
@@ -228,11 +219,6 @@ class _RegisterViewState extends State<RegisterView> {
                             autenticador
                                 .registrar(email, contrasena)
                                 .then((value) => manejarValorRegistro(value));
-
-                            // print(registroExitoso);
-                            // registroExitoso
-                            //     ? showErrorDialog(context)
-                            // showErrorDialog(context);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
@@ -266,15 +252,12 @@ class _RegisterViewState extends State<RegisterView> {
   manejarValorRegistro(value) {
     if (value is User) {
       showSuccessDialog(context);
-      print("ES USER");
     } else {
       var valor = value.message as String;
       if (valor == "Unable to establish connection on channel.") {
         valor = "Please make sure you provide an email and password";
       }
-      print(valor);
-      print("QQQQQQQQQQQQQQ");
-      print("No ES USER");
+
       showErrorDialog(context, valor);
     }
   }

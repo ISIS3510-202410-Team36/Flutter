@@ -37,15 +37,13 @@ class _BodyViewState extends State<BodyView> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor:
-              const Color.fromARGB(255, 212, 129, 12), // Set background color to red
+          backgroundColor: const Color.fromARGB(255, 212, 129, 12),
           title: const Text('Noise Alert'),
           content: const Text(
               "Noise reached 90 decibels of noise or higher , considero moving to a calmer place"),
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                // Close the dialog
                 start();
                 Navigator.of(context).pop();
               },
@@ -53,7 +51,6 @@ class _BodyViewState extends State<BodyView> {
             ),
             TextButton(
               onPressed: () {
-                // Close the dialog
                 stop();
                 Navigator.of(context).pop();
               },
@@ -70,30 +67,20 @@ class _BodyViewState extends State<BodyView> {
     stop();
   }
 
-  /// Check if microphone permission is granted.
   Future<bool> checkPermission() async => await Permission.microphone.isGranted;
 
-  /// Request the microphone permission.
   Future<void> requestPermission() async =>
       await Permission.microphone.request();
 
-  /// Start noise sampling.
   Future<void> start() async {
-    // Create a noise meter, if not already done.
     noiseMeter ??= NoiseMeter();
 
-    // Check permission to use the microphone.
-    //
-    // Remember to update the AndroidManifest file (Android) and the
-    // Info.plist and pod files (iOS).
     if (!(await checkPermission())) await requestPermission();
 
-    // Listen to the noise stream.
     _noiseSubscription = noiseMeter?.noise.listen(onData, onError: onError);
     setState(() => _isRecording = true);
   }
 
-  /// Stop sampling.
   void stop() {
     _noiseSubscription?.cancel();
     setState(() => _isRecording = false);
@@ -101,7 +88,7 @@ class _BodyViewState extends State<BodyView> {
 
   int currentIndex = 0;
 
-  void setCurrentIndex(int index){
+  void setCurrentIndex(int index) {
     setState(() {
       currentIndex = index;
     });
@@ -115,7 +102,9 @@ class _BodyViewState extends State<BodyView> {
     Container(
       color: Colors.white,
       alignment: Alignment.center,
-      child: SearchView(categoryIndex: 5,),
+      child: SearchView(
+        categoryIndex: 5,
+      ),
     ),
     Container(
       color: Colors.white,
@@ -146,7 +135,6 @@ class _BodyViewState extends State<BodyView> {
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       bottomNavigationBar: NavBar(
         onDestinationSelected: (int value) {
@@ -172,11 +160,6 @@ class _BodyViewState extends State<BodyView> {
     start();
 
     super.initState();
-
-    // if (_latestReading!.meanDecibel > 70.0) {
-    //   print(_latestReading?.meanDecibel.toStringAsFixed(2));
-    //   currentIndex = 3;
-    // }
   }
 
   @override
