@@ -8,6 +8,7 @@ import 'package:unimarket/Controllers/network_controller.dart';
 import 'package:unimarket/Views/register_view.dart';
 import 'package:unimarket/Controllers/auth_controller.dart';
 import 'package:unimarket/Views/body_view.dart';
+import 'package:unimarket/globals.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -19,6 +20,7 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   late AuthController _authController;
   final Connectivity connectivity = Connectivity();
+  final Globals globals = Globals();
 
   NetworkController netw = NetworkController();
   String email = "";
@@ -32,7 +34,9 @@ class _LoginViewState extends State<LoginView> {
   void initState() {
     WidgetsFlutterBinding.ensureInitialized();
     NetworkController netw = new NetworkController();
-    netCheck();
+    int n = globals.getNumberOfNetworkIsolates();
+    globals.getNumberOfNetworkIsolates() < 1 ? netCheck() : 1;
+
     _authController = AuthController();
     super.initState();
     focusNode.addListener(() {
@@ -57,11 +61,13 @@ class _LoginViewState extends State<LoginView> {
     var receivePort = ReceivePort();
     var rootToken = RootIsolateToken.instance!;
 
+    globals.increaseNetworkIsolate();
     final netIsol = await Isolate.spawn(
         netw.checkNetwork, [receivePort.sendPort, rootToken, connectivity]);
 
     receivePort.listen((total) {
       print("total");
+      globals.decreaseNetworkIsolate();
       showNetworkErrorDialog(context);
     });
   }
@@ -150,7 +156,7 @@ class _LoginViewState extends State<LoginView> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                netCheck();
+                globals.getNumberOfNetworkIsolates() < 1 ? netCheck() : 1;
               },
               child: const Text('OK'),
             ),
