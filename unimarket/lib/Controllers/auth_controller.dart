@@ -1,23 +1,21 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:unimarket/modelo/usuario.dart';
-import 'dart:developer' as dev;
+import 'package:unimarket/Controllers/search_controllerUnimarket.dart';
+import 'package:unimarket/Models/Repository/cartRepository.dart';
+import 'package:unimarket/Models/model.dart';
 
-class AuthService {
+class AuthController {
   final FirebaseAuth auth = FirebaseAuth.instance;
 
-// crear usuario a partir del firebaseuser
-  Usuario? usuarioFireBase(User user) {
-    // ignore: unnecessary_null_comparison
-    return user != null ? Usuario(usuarioId: user.uid) : null;
-  }
-
-//iniciari sesión con email y contraseña
   Future ingresar(String email, String password) async {
     try {
       UserCredential result = await auth.signInWithEmailAndPassword(
           email: email, password: password);
       User? usuario = result.user;
+      String? uuid = usuario?.uid.toString();
+      SearchControllerUnimarket().cargarProductos();
+      Model().setUserId(uuid);
+
+      CartRepository().createCart();
       return true;
     } catch (error) {
       print(error.toString());
@@ -25,18 +23,14 @@ class AuthService {
     }
   }
 
-  ////registrar email y contraseña
   Future registrar(String email, String contrasena) async {
     try {
       UserCredential resultado = await auth.createUserWithEmailAndPassword(
           email: email, password: contrasena);
       User? usuario = resultado.user;
       return usuario;
-      // print("Tipo UserCredential  " + resultado.toString());
-      // print("Tipo User  " + usuario.toString());
     } catch (e) {
-      print(e.toString());
-      // rethrow;
+      return e;
     }
   }
 }

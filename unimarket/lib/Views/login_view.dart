@@ -1,29 +1,82 @@
-import 'package:firebase_core/firebase_core.dart';
+import 'dart:isolate';
+import 'dart:ui';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:unimarket/Views/home_view.dart';
-import 'package:unimarket/Views/vista_registrarse.dart';
-import 'package:unimarket/modelo/auth.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_isolate/flutter_isolate.dart';
+import 'package:unimarket/Controllers/network_controller.dart';
+import 'package:unimarket/Views/register_view.dart';
+import 'package:unimarket/Controllers/auth_controller.dart';
 import 'package:unimarket/Views/body_view.dart';
+import 'package:unimarket/globals.dart';
 
-class VistaLogin extends StatefulWidget {
+class LoginView extends StatefulWidget {
+  const LoginView({super.key});
+
   @override
-  EstadoLogin createState() => EstadoLogin();
+  State<LoginView> createState() => _LoginViewState();
 }
 
-class EstadoLogin extends State<VistaLogin> {
+class _LoginViewState extends State<LoginView> {
+  late AuthController _authController;
+  final Connectivity connectivity = Connectivity();
+  final Globals globals = Globals();
+
+  NetworkController netw = NetworkController();
   String email = "";
   String contrasena = "";
-  AuthService autenticador = AuthService();
+  FocusNode focusNode = FocusNode();
+  FocusNode focusNode2 = FocusNode();
+  String hintTextEmailUsername = 'Email/Username';
+  String hintTextPass = "******";
 
-//hace parte del scaffold. ignorar para otras cosas
-  Widget _buildTextField(String labelText, String hintText,
-      {bool obscureText = false}) {
+  @override
+  void initState() {
+    WidgetsFlutterBinding.ensureInitialized();
+    NetworkController netw = new NetworkController();
+    globals.getNumberOfNetworkIsolates() < 1 ? netCheck() : 1;
+
+    _authController = AuthController();
+    super.initState();
+    focusNode.addListener(() {
+      if (focusNode.hasFocus) {
+        hintTextEmailUsername = '';
+      } else {
+        hintTextEmailUsername = 'Email/Username';
+      }
+      setState(() {});
+    });
+    focusNode2.addListener(() {
+      if (focusNode2.hasFocus) {
+        hintTextPass = '';
+      } else {
+        hintTextPass = "******";
+      }
+      setState(() {});
+    });
+  }
+
+  void netCheck() async {
+    var receivePort = ReceivePort();
+    var rootToken = RootIsolateToken.instance!;
+
+    globals.increaseNetworkIsolate();
+    final netIsol = await Isolate.spawn(
+        netw.checkNetwork, [receivePort.sendPort, rootToken, connectivity]);
+
+    receivePort.listen((total) {
+      print("total");
+      globals.decreaseNetworkIsolate();
+      showNetworkErrorDialog(context);
+    });
+  }
+
+  Widget _buildTextField(String labelText, {bool obscureText = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Container(
-          margin: const EdgeInsets.only(
-              right: 230, top: 17), // Adjust margin as needed
+          margin: const EdgeInsets.only(right: 230, top: 17),
           child: Text(
             labelText,
             textAlign: TextAlign.left,
@@ -39,11 +92,12 @@ class EstadoLogin extends State<VistaLogin> {
           onChanged: (val) {
             setState(() => email = val);
           },
+          focusNode: focusNode,
           obscureText: obscureText,
           decoration: InputDecoration(
             filled: true,
             fillColor: Colors.white,
-            hintText: hintText,
+            hintText: hintTextEmailUsername,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
             ),
@@ -53,14 +107,12 @@ class EstadoLogin extends State<VistaLogin> {
     );
   }
 
-  Widget _buildTextField1(String labelText, String hintText,
-      {bool obscureText = false}) {
+  Widget _buildTextField1(String labelText, {bool obscureText = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Container(
-          margin: const EdgeInsets.only(
-              right: 230, top: 17), // Adjust margin as needed
+          margin: const EdgeInsets.only(right: 230, top: 17),
           child: Text(
             labelText,
             textAlign: TextAlign.left,
@@ -76,11 +128,12 @@ class EstadoLogin extends State<VistaLogin> {
           onChanged: (val) {
             setState(() => contrasena = val);
           },
+          focusNode: focusNode2,
           obscureText: obscureText,
           decoration: InputDecoration(
             filled: true,
             fillColor: Colors.white,
-            hintText: hintText,
+            hintText: hintTextPass,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
             ),
@@ -90,22 +143,44 @@ class EstadoLogin extends State<VistaLogin> {
     );
   }
 
+  void showNetworkErrorDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Color.fromARGB(255, 212, 129, 12),
+          title: const Text('Network Error'),
+          content: const Text(
+              "You are currently experiencing connection loss, please connect to the internet to have a better experience"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                // globals.getNumberOfNetworkIsolates() < 1 ? netCheck() : 1;
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void showErrorDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Colors.red, // Set background color to red
-          title: Text('Oops!'),
-          content: Text(
+          backgroundColor: Color.fromARGB(255, 212, 129, 12),
+          title: const Text('Oops!'),
+          content: const Text(
               'Something went wrong singing in. Make sure the credentials you are providing are correct and that you already have an account registered'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                // Close the dialog
                 Navigator.of(context).pop();
               },
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         );
@@ -115,10 +190,9 @@ class EstadoLogin extends State<VistaLogin> {
 
   @override
   Widget build(BuildContext context) {
-    void authenticationProcess(bool existing_user) {
-      // Aquí va el proceso de verificación con Firebase
-
-      if (existing_user) {
+    void authenticationProcess(bool existingUser) {
+      if (existingUser) {
+        FlutterIsolate.killAll();
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => BodyView()));
       } else {
@@ -131,12 +205,11 @@ class EstadoLogin extends State<VistaLogin> {
       body: Column(
         children: [
           Container(
-            height: 200, // Adjust the height as needed
-            color: const Color.fromARGB(
-                255, 250, 206, 190), // Example color, change as needed
+            height: 200,
+            color: const Color.fromARGB(255, 250, 206, 190),
             child: const Center(
               child: Image(
-                image: AssetImage("assets/imagenes/logo.png"),
+                image: AssetImage("assets/images/logo.png"),
                 height: 100,
                 width: 100,
               ),
@@ -147,7 +220,6 @@ class EstadoLogin extends State<VistaLogin> {
               child: Container(
                 width: 350,
                 height: 550,
-                // margin: const EdgeInsets.only(bottom: 100),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   color: const Color.fromARGB(255, 255, 100, 35),
@@ -169,15 +241,14 @@ class EstadoLogin extends State<VistaLogin> {
                             ),
                           ),
                         ),
-                        _buildTextField('Email/Username', 'user@example.com'),
+                        _buildTextField('Email/Username'),
                         const SizedBox(height: 20.0),
-                        _buildTextField1('Password', '******',
-                            obscureText: true),
+                        _buildTextField1('Password', obscureText: true),
                         const SizedBox(height: 20.0),
                         ElevatedButton(
                           onPressed: () async {
-                            authenticationProcess(
-                                await autenticador.ingresar(email, contrasena));
+                            authenticationProcess(await _authController
+                                .ingresar(email, contrasena));
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
@@ -196,16 +267,15 @@ class EstadoLogin extends State<VistaLogin> {
                             ),
                           ),
                         ),
-                        const SizedBox(
-                            height:
-                                20.0), // Add some space between the Sign in button and Register button
+                        const SizedBox(height: 20.0),
                         ElevatedButton(
                           onPressed: () {
-                            // Add your registration logic here
+                            FlutterIsolate.killAll();
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => VistaRegistrarse()));
+                                    builder: (context) =>
+                                        const RegisterView()));
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.orange,

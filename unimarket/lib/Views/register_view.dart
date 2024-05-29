@@ -1,38 +1,108 @@
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'package:unimarket/Views/vista_login.dart';
-import 'package:unimarket/modelo/auth.dart';
+import 'dart:isolate';
+import 'dart:ui';
 
-class VistaRegistrarse extends StatefulWidget {
-  const VistaRegistrarse({super.key});
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:unimarket/Controllers/network_controller.dart';
+import 'package:unimarket/Views/login_view.dart';
+import 'package:unimarket/Controllers/auth_controller.dart';
+import 'package:unimarket/globals.dart';
+
+class RegisterView extends StatefulWidget {
+  const RegisterView({super.key});
   @override
-  EstadoRegistrarse createState() => EstadoRegistrarse();
+  State<RegisterView> createState() => _RegisterViewState();
 }
 
-class EstadoRegistrarse extends State<VistaRegistrarse> {
+class _RegisterViewState extends State<RegisterView> {
   String email = "";
   String contrasena = "";
-  AuthService autenticador = AuthService();
+  AuthController autenticador = AuthController();
   late bool registroExitoso;
+  FocusNode focusNode = FocusNode();
+  FocusNode focusNode2 = FocusNode();
+  String hintTextEmailUsername = 'Email/Username';
+  String hintTextPass = "******";
+  final Globals globals = Globals();
+  NetworkController netw = NetworkController();
+  final Connectivity connectivity = Connectivity();
 
-  void manejarRegistro() {}
+  @override
+  void initState() {
+    autenticador = AuthController();
+    NetworkController netw = new NetworkController();
+    super.initState();
+    globals.getNumberOfNetworkIsolates() < 1 ? netCheck() : 1;
+    focusNode.addListener(() {
+      if (focusNode.hasFocus) {
+        hintTextEmailUsername = '';
+      } else {
+        hintTextEmailUsername = 'Email/Username';
+      }
+      setState(() {});
+    });
+    focusNode2.addListener(() {
+      if (focusNode2.hasFocus) {
+        hintTextPass = '';
+      } else {
+        hintTextPass = "******";
+      }
+      setState(() {});
+    });
+  }
 
-  void showErrorDialog(BuildContext context) {
+  void netCheck() async {
+    var receivePort = ReceivePort();
+    var rootToken = RootIsolateToken.instance!;
+
+    globals.increaseNetworkIsolate();
+    final netIsol = await Isolate.spawn(
+        netw.checkNetwork, [receivePort.sendPort, rootToken, connectivity]);
+
+    receivePort.listen((total) {
+      print("total");
+      globals.decreaseNetworkIsolate();
+      showNetworkErrorDialog(context);
+    });
+  }
+
+  void showNetworkErrorDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Colors.red, // Set background color to red
-          title: Text('Oops!'),
-          content: Text(
-              'Something went wrong registering your user. Make sure you are using a valid email format. Make sure your password is at least 6 characters long. Make sure your email is not associated with an existing account'),
+          backgroundColor: Color.fromARGB(255, 212, 129, 12),
+          title: const Text('Network Error'),
+          content: const Text("Connect to internet please"),
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                // Close the dialog
+                Navigator.of(context).pop();
+                globals.getNumberOfNetworkIsolates() < 1 ? netCheck() : 1;
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showErrorDialog(BuildContext context, String msg) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Color.fromARGB(255, 212, 129, 12),
+          title: const Text('Oops!'),
+          content: Text(msg),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         );
@@ -45,17 +115,16 @@ class EstadoRegistrarse extends State<VistaRegistrarse> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Colors.green, // Set background color to green
-          title: Text('Success!'),
-          content: Text('Registration successful! Now please sign in'),
+          backgroundColor: Colors.green,
+          title: const Text('Success!'),
+          content: const Text('Registration successful! Now please sign in'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                // Close the dialog
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => VistaLogin()));
+                    MaterialPageRoute(builder: (context) => const LoginView()));
               },
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         );
@@ -63,15 +132,12 @@ class EstadoRegistrarse extends State<VistaRegistrarse> {
     );
   }
 
-//hace parte del scaffold. ignorar para otras cosas
-  Widget _buildTextField(String labelText, String hintText,
-      {bool obscureText = false}) {
+  Widget _buildTextField(String labelText, {bool obscureText = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Container(
-          margin: const EdgeInsets.only(
-              right: 230, top: 17), // Adjust margin as needed
+          margin: const EdgeInsets.only(right: 230, top: 17),
           child: Text(
             labelText,
             textAlign: TextAlign.left,
@@ -87,11 +153,12 @@ class EstadoRegistrarse extends State<VistaRegistrarse> {
           onChanged: (val) {
             setState(() => email = val);
           },
+          focusNode: focusNode,
           obscureText: obscureText,
           decoration: InputDecoration(
             filled: true,
             fillColor: Colors.white,
-            hintText: hintText,
+            hintText: hintTextEmailUsername,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
             ),
@@ -101,14 +168,12 @@ class EstadoRegistrarse extends State<VistaRegistrarse> {
     );
   }
 
-  Widget _buildTextField1(String labelText, String hintText,
-      {bool obscureText = false}) {
+  Widget _buildTextField1(String labelText, {bool obscureText = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Container(
-          margin: const EdgeInsets.only(
-              right: 230, top: 17), // Adjust margin as needed
+          margin: const EdgeInsets.only(right: 230, top: 17),
           child: Text(
             labelText,
             textAlign: TextAlign.left,
@@ -124,11 +189,12 @@ class EstadoRegistrarse extends State<VistaRegistrarse> {
           onChanged: (val) {
             setState(() => contrasena = val);
           },
+          focusNode: focusNode2,
           obscureText: obscureText,
           decoration: InputDecoration(
             filled: true,
             fillColor: Colors.white,
-            hintText: hintText,
+            hintText: hintTextPass,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
             ),
@@ -144,25 +210,23 @@ class EstadoRegistrarse extends State<VistaRegistrarse> {
       backgroundColor: const Color.fromARGB(255, 250, 206, 190),
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => VistaLogin()));
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const LoginView()));
           },
         ),
-        backgroundColor:
-            Colors.transparent, // Para hacer transparente la AppBar
-        elevation: 0, // Para eliminar la sombra debajo de la AppBar
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
       body: Column(
         children: [
           Container(
-            height: 200, // Adjust the height as needed
-            color: const Color.fromARGB(
-                255, 250, 206, 190), // Example color, change as needed
+            height: 200,
+            color: const Color.fromARGB(255, 250, 206, 190),
             child: const Center(
               child: Image(
-                image: AssetImage("assets/imagenes/logo.png"),
+                image: AssetImage("assets/images/logo.png"),
                 height: 100,
                 width: 100,
               ),
@@ -194,27 +258,15 @@ class EstadoRegistrarse extends State<VistaRegistrarse> {
                             ),
                           ),
                         ),
-                        _buildTextField('Email/Username', 'user@example.com'),
+                        _buildTextField('Email/Username'),
                         const SizedBox(height: 20.0),
-                        _buildTextField1('Password', '******',
-                            obscureText: true),
+                        _buildTextField1('Password', obscureText: true),
                         const SizedBox(height: 20.0),
                         ElevatedButton(
                           onPressed: () async {
-                            // try {
-                            autenticador.registrar(email, contrasena).then(
-                                (value) => value == null
-                                    ? showErrorDialog(context)
-                                    : showSuccessDialog(context));
-                            // } catch (e) {
-                            //   print(e.toString() + "9999999999999999999999");
-                            //   showErrorDialog(context);
-                            // }
-
-                            // print(registroExitoso);
-                            // registroExitoso
-                            //     ? showErrorDialog(context)
-                            // showErrorDialog(context);
+                            autenticador
+                                .registrar(email, contrasena)
+                                .then((value) => manejarValorRegistro(value));
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
@@ -243,5 +295,18 @@ class EstadoRegistrarse extends State<VistaRegistrarse> {
         ],
       ),
     );
+  }
+
+  manejarValorRegistro(value) {
+    if (value is User) {
+      showSuccessDialog(context);
+    } else {
+      var valor = value.message as String;
+      if (valor == "Unable to establish connection on channel.") {
+        valor = "Please make sure you provide an email and password";
+      }
+
+      showErrorDialog(context, valor);
+    }
   }
 }
