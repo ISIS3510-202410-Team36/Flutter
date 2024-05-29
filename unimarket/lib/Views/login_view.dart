@@ -34,7 +34,6 @@ class _LoginViewState extends State<LoginView> {
   void initState() {
     WidgetsFlutterBinding.ensureInitialized();
     NetworkController netw = new NetworkController();
-    int n = globals.getNumberOfNetworkIsolates();
     globals.getNumberOfNetworkIsolates() < 1 ? netCheck() : 1;
 
     _authController = AuthController();
@@ -151,12 +150,13 @@ class _LoginViewState extends State<LoginView> {
         return AlertDialog(
           backgroundColor: Color.fromARGB(255, 212, 129, 12),
           title: const Text('Network Error'),
-          content: const Text("Connect to internet please"),
+          content: const Text(
+              "You are currently experiencing connection loss, please connect to the internet to have a better experience"),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                globals.getNumberOfNetworkIsolates() < 1 ? netCheck() : 1;
+                // globals.getNumberOfNetworkIsolates() < 1 ? netCheck() : 1;
               },
               child: const Text('OK'),
             ),

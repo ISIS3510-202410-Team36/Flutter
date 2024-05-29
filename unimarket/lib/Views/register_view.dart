@@ -1,7 +1,13 @@
+import 'dart:isolate';
+import 'dart:ui';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:unimarket/Controllers/network_controller.dart';
 import 'package:unimarket/Views/login_view.dart';
 import 'package:unimarket/Controllers/auth_controller.dart';
+import 'package:unimarket/globals.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -18,11 +24,16 @@ class _RegisterViewState extends State<RegisterView> {
   FocusNode focusNode2 = FocusNode();
   String hintTextEmailUsername = 'Email/Username';
   String hintTextPass = "******";
+  final Globals globals = Globals();
+  NetworkController netw = NetworkController();
+  final Connectivity connectivity = Connectivity();
 
   @override
   void initState() {
     autenticador = AuthController();
+    NetworkController netw = new NetworkController();
     super.initState();
+    globals.getNumberOfNetworkIsolates() < 1 ? netCheck() : 1;
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
         hintTextEmailUsername = '';
@@ -39,6 +50,43 @@ class _RegisterViewState extends State<RegisterView> {
       }
       setState(() {});
     });
+  }
+
+  void netCheck() async {
+    var receivePort = ReceivePort();
+    var rootToken = RootIsolateToken.instance!;
+
+    globals.increaseNetworkIsolate();
+    final netIsol = await Isolate.spawn(
+        netw.checkNetwork, [receivePort.sendPort, rootToken, connectivity]);
+
+    receivePort.listen((total) {
+      print("total");
+      globals.decreaseNetworkIsolate();
+      showNetworkErrorDialog(context);
+    });
+  }
+
+  void showNetworkErrorDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Color.fromARGB(255, 212, 129, 12),
+          title: const Text('Network Error'),
+          content: const Text("Connect to internet please"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                globals.getNumberOfNetworkIsolates() < 1 ? netCheck() : 1;
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void showErrorDialog(BuildContext context, String msg) {
