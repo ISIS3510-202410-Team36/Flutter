@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:unimarket/Controllers/search_controllerUnimarket.dart';
 import 'package:unimarket/Models/Repository/cartRepository.dart';
 import 'package:unimarket/Models/model.dart';
+import 'package:unimarket/globals.dart';
 
 class AuthController {
   final FirebaseAuth auth = FirebaseAuth.instance;
@@ -14,7 +15,7 @@ class AuthController {
       String? uuid = usuario?.uid.toString();
       SearchControllerUnimarket().cargarProductos();
       Model().setUserId(uuid);
-
+      Globals().setSessionUserId(uuid!);
       CartRepository().createCart();
       return true;
     } catch (error) {

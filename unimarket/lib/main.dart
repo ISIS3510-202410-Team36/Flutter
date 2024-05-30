@@ -1,7 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:unimarket/Views/home_view.dart';
 import 'package:unimarket/Views/settings_view.dart';
+import 'package:unimarket/Views/userInfoForm_view.dart';
 import 'package:unimarket/firebase_options.dart';
 import 'package:unimarket/Views/login_view.dart';
 import 'package:unimarket/resources/connectivity_service.dart';

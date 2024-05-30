@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:light/light.dart';
 import 'package:provider/provider.dart';
 import 'package:unimarket/Controllers/home_controller.dart';
+import 'package:unimarket/Models/Repository/sharedPreferences.dart';
 import 'package:unimarket/Views/search_view/search_view.dart';
 import 'package:flutter/services.dart';
+import 'package:unimarket/Views/userInfoForm_view.dart';
+import 'package:unimarket/globals.dart';
 import 'package:unimarket/theme.dart';
 import 'package:unimarket/resources/connectivity_service.dart';
 
@@ -74,6 +77,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
+
     getData();
     getData1();
     _homeController = HomeController();

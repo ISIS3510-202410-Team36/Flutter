@@ -5,26 +5,38 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_isolate/flutter_isolate.dart';
 import 'package:unimarket/Controllers/network_controller.dart';
+import 'package:unimarket/Models/Repository/sharedPreferences.dart';
 import 'package:unimarket/Views/register_view.dart';
 import 'package:unimarket/Controllers/auth_controller.dart';
 import 'package:unimarket/Views/body_view.dart';
+import 'package:unimarket/Views/userInfoForm_view.dart';
 import 'package:unimarket/globals.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
 
   @override
-  State<LoginView> createState() => _LoginViewState();
+  _LoginViewState createState() {
+    return _LoginViewState();
+  }
 }
 
 class _LoginViewState extends State<LoginView> {
   late AuthController _authController;
   final Connectivity connectivity = Connectivity();
   final Globals globals = Globals();
-
+  final _formKey = GlobalKey<FormState>();
   NetworkController netw = NetworkController();
   String email = "";
   String contrasena = "";
+  String formName = "";
+  String formAge = "";
+  String formLastName = "";
+  String formNickName = "";
+  String formGender = "";
+  String formExtra = "";
+  String formUniversity = "";
+
   FocusNode focusNode = FocusNode();
   FocusNode focusNode2 = FocusNode();
   String hintTextEmailUsername = 'Email/Username';
@@ -65,7 +77,6 @@ class _LoginViewState extends State<LoginView> {
         netw.checkNetwork, [receivePort.sendPort, rootToken, connectivity]);
 
     receivePort.listen((total) {
-      print("total");
       globals.decreaseNetworkIsolate();
       showNetworkErrorDialog(context);
     });
@@ -188,13 +199,149 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
+  checkPreferences(BuildContext context) async {
+    String uid = await SharedPreferencesR().getSessionUID();
+    if (uid == "0" || uid != Globals.SessionUserId) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Welcome to Unimarket'),
+            content: Container(
+              color: Colors.orange[50], // Light orange background color
+              padding: EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text(
+                        'We would like to get to know you! Please provide us with the following information so you can have the best experience',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField(
+                        decoration: InputDecoration(labelText: 'Age:'),
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value != null) {
+                            setState(() => formAge = value);
+                          }
+                          return null;
+                        },
+                      ),
+                      TextFormField(
+                        decoration: InputDecoration(labelText: 'Name:'),
+                        validator: (value) {
+                          if (value != null) {
+                            setState(() => formName = value);
+                          }
+                        },
+                      ),
+                      TextFormField(
+                        decoration: InputDecoration(labelText: 'Nickname:'),
+                        validator: (value) {
+                          if (value != null) {
+                            setState(() => formNickName = value);
+                          }
+                        },
+                      ),
+                      TextFormField(
+                        decoration: InputDecoration(labelText: 'Last Name:'),
+                        validator: (value) {
+                          if (value != null) {
+                            setState(() => formLastName = value);
+                          }
+                        },
+                      ),
+                      TextFormField(
+                        decoration: InputDecoration(labelText: 'Gender:'),
+                        validator: (value) {
+                          if (value != null) {
+                            setState(() => formGender = value);
+                          }
+                        },
+                      ),
+                      TextFormField(
+                        decoration: InputDecoration(labelText: 'University:'),
+                        validator: (value) {
+                          if (value != null) {
+                            setState(() => formUniversity = value);
+                          }
+                        },
+                      ),
+                      TextFormField(
+                        decoration: InputDecoration(
+                          labelText: 'Extra info you would like to share:',
+                        ),
+                        maxLines: 3,
+                        validator: (value) {
+                          if (value != null) {
+                            setState(() => formExtra = value);
+                          }
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      Center(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            _formKey.currentState!.validate();
+                            SharedPreferencesR().UpdateValues(
+                                formAge,
+                                formName,
+                                formGender,
+                                formLastName,
+                                formUniversity,
+                                formNickName,
+                                formExtra);
+                            Navigator.of(context).pop(); // Close the dialog
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => BodyView()));
+                          },
+                          child: Text('Submit'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      );
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => BodyView()));
+    } else {
+      String nick = await SharedPreferencesR().getNickName();
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Welcome back!!  ' + nick + '   We missed you!!'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => BodyView()));
+                  },
+                  child: Text('Close'),
+                ),
+              ],
+            );
+          });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     void authenticationProcess(bool existingUser) {
       if (existingUser) {
-        FlutterIsolate.killAll();
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => BodyView()));
+        checkPreferences(context);
       } else {
         showErrorDialog(context);
       }
