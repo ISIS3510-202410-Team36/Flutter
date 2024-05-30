@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shake/shake.dart';
 import 'package:unimarket/Views/cart_view.dart';
-import 'package:unimarket/Views/chat_view.dart';
+import 'package:unimarket/Views/chat_view/chat_view.dart';
 import 'package:unimarket/Views/home_view.dart';
 import 'package:unimarket/Views/publish_view/publish_view.dart';
 import 'package:unimarket/Views/search_view/search_view.dart';

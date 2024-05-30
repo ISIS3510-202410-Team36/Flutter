@@ -28,7 +28,7 @@ class _LoginViewState extends State<LoginView> {
   final _formKey = GlobalKey<FormState>();
   NetworkController netw = NetworkController();
   String email = "";
-  String contrasena = "";
+  String contrasena = "";  
   String formName = "";
   String formAge = "";
   String formLastName = "";
@@ -339,7 +339,9 @@ class _LoginViewState extends State<LoginView> {
   Widget build(BuildContext context) {
     void authenticationProcess(bool existingUser) {
       if (existingUser) {
-        checkPreferences(context);
+        FlutterIsolate.killAll();
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => BodyView()));
       } else {
         showErrorDialog(context);
       }

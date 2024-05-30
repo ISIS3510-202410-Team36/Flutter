@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:unimarket/Views/body_view.dart';
+import 'package:unimarket/Views/chat_view/chat_view.dart';
 import 'package:unimarket/Views/home_view.dart';
 import 'package:unimarket/Views/settings_view.dart';
 import 'package:unimarket/Views/userInfoForm_view.dart';
@@ -37,6 +39,7 @@ class MyApp extends StatelessWidget {
             theme: notifier.darkTheme ? dark : light,
             debugShowCheckedModeBanner: false,
             home: const LoginView(),
+            //home: const BodyView(),
           );
         },
       ),
