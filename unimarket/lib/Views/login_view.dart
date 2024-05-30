@@ -22,7 +22,7 @@ class _LoginViewState extends State<LoginView> {
 
   NetworkController netw = NetworkController();
   String email = "";
-  String contrasena = "";
+  String contrasena = "";  
   FocusNode focusNode = FocusNode();
   FocusNode focusNode2 = FocusNode();
   String hintTextEmailUsername = 'Email/Username';
@@ -188,7 +188,7 @@ class _LoginViewState extends State<LoginView> {
       if (existingUser) {
         FlutterIsolate.killAll();
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => BodyView()));
+            context, MaterialPageRoute(builder: (context) => const BodyView()));
       } else {
         showErrorDialog(context);
       }

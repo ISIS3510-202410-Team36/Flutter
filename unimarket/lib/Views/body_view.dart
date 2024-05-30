@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shake/shake.dart';
 import 'package:unimarket/Views/cart_view.dart';
-import 'package:unimarket/Views/chat_view.dart';
+import 'package:unimarket/Views/chat_view/chat_view.dart';
 import 'package:unimarket/Views/home_view.dart';
 import 'package:unimarket/Views/publish_view/publish_view.dart';
 import 'package:unimarket/Views/search_view/search_view.dart';
@@ -86,7 +86,7 @@ class _BodyViewState extends State<BodyView> {
     setState(() => _isRecording = false);
   }
 
-  int currentIndex = 0;
+  int currentIndex = 5;
 
   void setCurrentIndex(int index) {
     setState(() {

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:unimarket/Controllers/search_controllerUnimarket.dart';
 import 'package:unimarket/Models/Repository/cartRepository.dart';
 import 'package:unimarket/Models/model.dart';
+import 'package:unimarket/Views/chat_view/database_service.dart';
 
 class AuthController {
   final FirebaseAuth auth = FirebaseAuth.instance;
@@ -28,6 +29,11 @@ class AuthController {
       UserCredential resultado = await auth.createUserWithEmailAndPassword(
           email: email, password: contrasena);
       User? usuario = resultado.user;
+
+      if(usuario != null){
+        await DatabaseService(uid:usuario.uid).savingUserData("usuario2", email);
+      }
+
       return usuario;
     } catch (e) {
       return e;
