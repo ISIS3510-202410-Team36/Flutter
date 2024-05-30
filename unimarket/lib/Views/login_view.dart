@@ -313,8 +313,6 @@ class _LoginViewState extends State<LoginView> {
           );
         },
       );
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => BodyView()));
     } else {
       String nick = await SharedPreferencesR().getNickName();
       showDialog(
