@@ -8,6 +8,7 @@ import 'package:unimarket/Views/home_view.dart';
 import 'package:unimarket/Views/publish_view/publish_view.dart';
 import 'package:unimarket/Views/search_view/search_view.dart';
 import 'package:unimarket/Views/settings_view.dart';
+import 'package:unimarket/Views/user_view.dart';
 import 'package:unimarket/nav_bar.dart';
 import 'package:noise_meter/noise_meter.dart';
 
@@ -130,7 +131,7 @@ class _BodyViewState extends State<BodyView> {
     Container(
       color: Colors.white,
       alignment: Alignment.center,
-      child: const Text('Here goes the user profile page'),
+      child: UserView(),
     )
   ];
 

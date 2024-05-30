@@ -33,6 +33,66 @@ class SharedPreferencesR {
     }
   }
 
+  Future<String> getName() async {
+    final SharedPreferences prefs = await _prefs;
+    String? nick = prefs.getString('Name');
+    if (nick == null) {
+      return "0";
+    } else {
+      return nick;
+    }
+  }
+
+  Future<String> getLast() async {
+    final SharedPreferences prefs = await _prefs;
+    String? nick = prefs.getString('Last');
+    if (nick == null) {
+      return "0";
+    } else {
+      return nick;
+    }
+  }
+
+  Future<String> getAge() async {
+    final SharedPreferences prefs = await _prefs;
+    String? nick = prefs.getString('Age');
+    if (nick == null) {
+      return "0";
+    } else {
+      return nick;
+    }
+  }
+
+  Future<String> getGender() async {
+    final SharedPreferences prefs = await _prefs;
+    String? nick = prefs.getString('Gender');
+    if (nick == null) {
+      return "0";
+    } else {
+      return nick;
+    }
+  }
+
+  Future<String> getUniversity() async {
+    final SharedPreferences prefs = await _prefs;
+    String? nick = prefs.getString('University');
+    if (nick == null) {
+      return "0";
+    } else {
+      return nick;
+    }
+  }
+
+  Future<String> getExtra() async {
+    final SharedPreferences prefs = await _prefs;
+    String? nick = prefs.getString('Extra');
+    if (nick == null) {
+      return "0";
+    } else {
+      return nick;
+    }
+  }
+
   UpdateValues(String edad, String nombre, String genero, String apellido,
       String uni, String nick, String extra) async {
     final SharedPreferences prefs = await _prefs;

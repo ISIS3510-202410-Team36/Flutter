@@ -1,3 +1,14 @@
+import 'dart:io';
+import 'dart:math';
+import 'dart:typed_data';
+import 'package:network_to_file_image/network_to_file_image.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'dart:math';
+
 import 'package:unimarket/Models/Repository/cartRepository.dart';
 import 'package:unimarket/Models/Repository/productReposirory.dart';
 import 'package:unimarket/Models/product_model.dart';
@@ -7,6 +18,11 @@ class Model {
   final productosCarrito = <ProductModel>[];
   var userId;
   var cartPrice = 0;
+  late Directory _appDocsDir;
+
+  Future<void> ini() async {
+    _appDocsDir = await getApplicationDocumentsDirectory();
+  }
 
   static final Model single = Model._();
   factory Model() => single;
@@ -38,9 +54,6 @@ class Model {
     productos.add(p);
   }
 
-  
-
-
   getAllProducts() async {
     List<ProductModel> lista = <ProductModel>[];
     await ProductRepository().getAllProducts(lista);
@@ -62,12 +75,9 @@ class Model {
     //filteredProducts.add(product);
   }
 
-  incrementViews(ProductModel prod){
+  incrementViews(ProductModel prod) {
     ProductRepository().incrementView(prod);
   }
-
-
-
 
   void addProductToCart(String? pId) {
     CartRepository().addToCart(pId);
@@ -89,7 +99,7 @@ class Model {
     return userId;
   }
 
-  meterProductoCarrito(String idProducto) {
+  meterProductoCarrito(String idProducto) async {
     ProductModel producto = getProductById(idProducto, "Products");
     if (!productosCarrito.contains(producto)) {
       productosCarrito.add(producto);
@@ -98,6 +108,7 @@ class Model {
   }
 
   meterProductoCarritoInicio(String idProducto) {
+    ini();
     ProductModel producto = getProductById(idProducto, "Products");
     productosCarrito.add(producto);
     cartPrice = cartPrice + producto.price;

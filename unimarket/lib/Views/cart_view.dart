@@ -39,7 +39,13 @@ class _CartViewState extends State<CartView> {
                           ),
                         ),
                         SizedBox(height: 20),
-                        CachedNetworkImage(imageUrl: products[index].image),
+                        CachedNetworkImage(
+                          imageUrl: products[index].image,
+                          placeholder: (context, url) =>
+                              CircularProgressIndicator(),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
+                        ),
                         // Image.network(
                         //   products[index].image,
                         //   height: 200,
