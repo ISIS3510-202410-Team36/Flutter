@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:unimarket/Controllers/cart_controller.dart';
 import 'package:unimarket/Models/model.dart';
@@ -38,11 +39,12 @@ class _CartViewState extends State<CartView> {
                           ),
                         ),
                         SizedBox(height: 20),
-                        Image.network(
-                          products[index].image,
-                          height: 200,
-                          width: 150,
-                        ),
+                        CachedNetworkImage(imageUrl: products[index].image),
+                        // Image.network(
+                        //   products[index].image,
+                        //   height: 200,
+                        //   width: 150,
+                        // ),
                         SizedBox(height: 20),
                         Text(
                           "\$ ${products[index].price.toStringAsFixed(2)}",
